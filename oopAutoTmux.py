@@ -1,13 +1,11 @@
 #!/usr/bin/python3
-'''
-Automatic start of tmux with separate windows for each basic enumeration tool of your choise. If flag -r is set it switches to window 0 and starts a initial scan on the provided ipadress.
-'''
+
 import sys
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description = "Tmux startscript")
-parser.add_argument('-w', '--windows', type = str, metavar='', required=True, help='A comma separated list of window names you want ex: "window1,window2,window3"')
+parser = argparse.ArgumentParser(description = "Tmux startscript. Automatic start of tmux with separate windows for each basic enumeration tool of your choise. If flag -r is set it switches to window 0 and starts a initial scan on the provided ipadress.")
+parser.add_argument('-w', '--windows', type = str, metavar='', required=True, help='A comma separated list of window names you want ex: -w window1,window2,window3')
 parser.add_argument('-i', '--ipadress', type = str, metavar='', required=True, help='Target ipadress')
 parser.add_argument('-n', '--session_name', type = str, metavar='', required=True, help='The tmux session name')
 parser.add_argument('-r', '--run_nmap', action='store_true', help='Set to start nmap automaticly')
