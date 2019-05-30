@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 '''
-Automatic start of tmux with separate windows for each basic enumeration tool of your choise. Switching to nmap window and starts a initial scan on the provided ipadress.
+Automatic start of tmux with separate windows for each basic enumeration tool of your choise. If flag -r is set it switches to window 0 and starts a initial scan on the provided ipadress.
 '''
 import sys
 import os
@@ -9,6 +10,7 @@ parser = argparse.ArgumentParser(description = "Tmux startscript")
 parser.add_argument('-w', '--windows', type = str, metavar='', required=True, help='A comma separated list of window names you want ex: "window1,window2,window3"')
 parser.add_argument('-i', '--ipadress', type = str, metavar='', required=True, help='Target ipadress')
 parser.add_argument('-n', '--session_name', type = str, metavar='', required=True, help='The tmux session name')
+parser.add_argument('-r', '--run_nmap', action='store_true', help='Set to start nmap automaticly')
 args = parser.parse_args()
 
 
@@ -17,30 +19,29 @@ class tmux:
         self.name = name
         self.windows = windows
     
-    
+    # create tmux session with the name of --session_name argument
     def create_session(self):
-        return os.system('tmux -2 new-session -d -s %s'%(self.name))
+        return os.system('tmux -2 new-session -d -s {0}'.format(self.name))
     
+    # loop thru the list of window names from --windows argument and make a new window for each  
     def create_windows(self):
         app_list = [str(app) for app in args.windows.split(',')]
         for app in app_list:
-            os.system('tmux new-window -t %s:1 -n %s'%(self.name, app))
+            os.system('tmux new-window -t {0}:1 -n {1}'.format(self.name, app))
 
-
+    # select window 0 and attach to the session
     def attach_session(self):
-        os.system('tmux select-window -t %s:1'%(self.name))
-        os.system('tmux -2 attach-session -t %s'%(self.name))
+        os.system('tmux select-window -t {0}:0'.format(self.name))
+        os.system('tmux -2 attach-session -t {0}'.format(self.name))
 
+    # if --run_nmap flag is set then select window 0 and run a nmap scan 
+    def start_nmap(self, ipadress):
+        if args.run_nmap:
+            os.system('tmux select-window -t {0}:0'.format(self.name))
+            os.system('tmux send-keys -t {0} "nmap -sV -sC -oA {1} {2}" C-m'.format(self.name, self.name, ipadress))
+        else:
+            return
 
-    #def start_nmap(self):
-    #    app_list = [str(app) for app in args.windows.split(',')]
-    #    index = 0
-    #    for app in app_list:
-    #        if app == 'nmap':
-    #            #os.system('tmux select-window -t %:%'%(self.name,index))
-    #            #os.system('tmux send-keys "nmap -sV -sC -oA %s %s" C-m'%(self.name, self.t_adress))
-    #        else:
-    #            index += 1
 
 class target:
     def __init__(self, t_ipadress):
@@ -52,6 +53,7 @@ def main():
     tmux_object = tmux(args.session_name, args.windows)
     tmux_object.create_session()
     tmux_object.create_windows()
+    tmux_object.start_nmap(args.ipadress)
     tmux_object.attach_session()
 
 if __name__=='__main__':
