@@ -21,9 +21,8 @@ class tmux:
     def create_session(self):
         return os.system('tmux -2 new-session -d -s {0}'.format(self.name))
     
-    # loop thru the list of window names from --windows argument and make a new window for each  
+    # loop thru the list of window names from --window_list argument and make a new window for each item in list  
     def create_windows(self):
-        #app_list = [str(app) for app in args.windows.split(',')]
         app_list = args.window_list
         for app in app_list:
             os.system('tmux new-window -t {0}:1 -n {1}'.format(self.name, app))
