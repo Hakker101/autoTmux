@@ -5,7 +5,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description = "Tmux startscript. Automatic start of tmux with separate windows for each basic enumeration tool of your choise. If flag -r is set it switches to window 0 and starts a initial scan on the provided ipadress.")
-parser.add_argument('-w', '--windows', type = str, metavar='', required=True, help='A comma separated list of window names you want ex: -w window1,window2,window3')
+parser.add_argument('-l', '--window_list', action='append', required=True, help='The windows you want EX: -l nmap,nikto,dirbuster')
 parser.add_argument('-i', '--ipadress', type = str, metavar='', required=True, help='Target ipadress')
 parser.add_argument('-n', '--session_name', type = str, metavar='', required=True, help='The tmux session name')
 parser.add_argument('-r', '--run_nmap', action='store_true', help='Set to start nmap automaticly')
@@ -23,7 +23,8 @@ class tmux:
     
     # loop thru the list of window names from --windows argument and make a new window for each  
     def create_windows(self):
-        app_list = [str(app) for app in args.windows.split(',')]
+        #app_list = [str(app) for app in args.windows.split(',')]
+        app_list = args.window_list
         for app in app_list:
             os.system('tmux new-window -t {0}:1 -n {1}'.format(self.name, app))
 
@@ -48,7 +49,7 @@ class target:
     
 def main():
     t = target(args.ipadress)
-    tmux_object = tmux(args.session_name, args.windows)
+    tmux_object = tmux(args.session_name, args.window_list)
     tmux_object.create_session()
     tmux_object.create_windows()
     tmux_object.start_nmap(args.ipadress)
